@@ -90,7 +90,7 @@ def test_purchase_places_without_enough_points(client, patch_data):
         data={
             'competition': 'Test Competition',
             'club': 'Test Club',
-            'places': '20',
+            'places': '11',
         }
     )
 
@@ -99,6 +99,27 @@ def test_purchase_places_without_enough_points(client, patch_data):
     assert b'How many places?' in response.data
     # Verify if flash message appear
     assert b'You do not have enough points.' in response.data
+    # Check that the number of places available for the competition has not changed
+    assert server.competitions[0]['numberOfPlaces'] == '15'
+    # Check that the club's points have not changed
+    assert server.clubs[0]['points'] == '10'
+
+
+def test_purchase_more_than_12_places(client, patch_data):
+    response = client.post(
+        '/purchasePlaces',
+        data={
+            'competition': 'Test Competition',
+            'club': 'Test Club',
+            'places': '13',
+        }
+    )
+
+    assert response.status_code == 200
+    # Verify an element of the booking template to check if it is displayed properly
+    assert b'How many places?' in response.data
+    # Verify if flash message appear
+    assert b'You cannot book more than 12 places.' in response.data
     # Check that the number of places available for the competition has not changed
     assert server.competitions[0]['numberOfPlaces'] == '15'
     # Check that the club's points have not changed
