@@ -17,14 +17,24 @@ def client(app):
     return app.test_client()
 
 
-def test_show_summary_valid_email(client, monkeypatch):
-    monkeypatch.setattr(server, 'clubs', [
-        {'name': 'Test Club', 'email': 'test@club.com', 'points': '10'}
-    ])
-    monkeypatch.setattr(server, 'competitions', [
-        {'name': 'Test Competition', 'date': '2026-02-12 12:30:00', 'numberOfPlaces': '15'}
-    ])
+@pytest.fixture
+def clubs_sample():
+    return [{'name': 'Test Club', 'email': 'test@club.com', 'points': '10'}]
 
+
+@pytest.fixture
+def competitions_sample():
+    return [{'name': 'Test Competition', 'date': '2026-02-12 12:30:00', 'numberOfPlaces': '15'}]
+
+
+@pytest.fixture
+def patch_data(monkeypatch, clubs_sample, competitions_sample):
+    monkeypatch.setattr(server, 'clubs', clubs_sample)
+    monkeypatch.setattr(server, 'competitions', competitions_sample)
+    return clubs_sample, competitions_sample
+
+
+def test_show_summary_valid_email(client, patch_data):
     response = client.post(
         '/showSummary',
         data={'email': 'test@club.com'}
@@ -53,14 +63,7 @@ def test_show_summary_invalid_email(client, monkeypatch):
     assert 'Sorry, that email wasn\'t found.' in page
 
 
-def test_purchase_places_with_enough_points(client, monkeypatch):
-    monkeypatch.setattr(server, 'competitions', [
-        {'name': 'Test Competition', 'date': '2026-02-12 12:30:00', 'numberOfPlaces': '15'}
-    ])
-    monkeypatch.setattr(server, 'clubs', [
-        {'name': 'Test Club', 'email': 'test@club.com', 'points': '10'}
-    ])
-
+def test_purchase_places_with_enough_points(client, patch_data):
     response = client.post(
         '/purchasePlaces',
         data={
@@ -81,14 +84,7 @@ def test_purchase_places_with_enough_points(client, monkeypatch):
     assert server.clubs[0]['points'] == 5
 
 
-def test_purchase_places_without_enough_points(client, monkeypatch):
-    monkeypatch.setattr(server, 'competitions', [
-        {'name': 'Test Competition', 'date': '2026-02-12 12:30:00', 'numberOfPlaces': '15'}
-    ])
-    monkeypatch.setattr(server, 'clubs', [
-        {'name': 'Test Club', 'email': 'test@club.com', 'points': '10'}
-    ])
-
+def test_purchase_places_without_enough_points(client, patch_data):
     response = client.post(
         '/purchasePlaces',
         data={
