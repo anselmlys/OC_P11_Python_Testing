@@ -48,11 +48,7 @@ def test_show_summary_valid_email(client, patch_data):
     assert b'Points available:' in response.data
 
 
-def test_show_summary_invalid_email(client, monkeypatch):
-    monkeypatch.setattr(server, 'clubs', [
-        {'name': 'Test Club', 'email': 'test@club.com', 'points': '10'}
-    ])
-
+def test_show_summary_invalid_email(client, patch_data):
     response = client.post(
         '/showSummary',
         data={'email': 'unknown@club.com'},
@@ -66,14 +62,10 @@ def test_show_summary_invalid_email(client, monkeypatch):
     assert 'Sorry, that email wasn\'t found.' in page
 
 
-def test_book_route_allows_future_competition(client, monkeypatch, clubs_sample):
-    monkeypatch.setattr(server, 'clubs', clubs_sample)
-    monkeypatch.setattr(server, 'competitions', [
-        {'name': 'Test Competition', 'date': '2045-02-12 12:30:00', 'numberOfPlaces': '15'}
-    ])
+def test_book_route_allows_future_competition(client, patch_data):
 
     response = client.get(
-        '/book/Test%20Competition/Test%20Club',
+        '/book/Test%20Competition%202/Test%20Club',
     )
 
     assert response.status_code == 200
