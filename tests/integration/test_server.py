@@ -24,7 +24,10 @@ def clubs_sample():
 
 @pytest.fixture
 def competitions_sample():
-    return [{'name': 'Test Competition', 'date': '2026-02-12 12:30:00', 'numberOfPlaces': '15'}]
+    return [
+        {'name': 'Test Competition', 'date': '2026-02-12 12:30:00', 'numberOfPlaces': '15'},
+        {'name': 'Test Competition 2', 'date': '2045-01-01 14:00:00', 'numberOfPlaces': '8'}
+    ]
 
 
 @pytest.fixture
@@ -61,6 +64,30 @@ def test_show_summary_invalid_email(client, monkeypatch):
     assert response.status_code == 200
     assert 'Please enter your secretary email to continue:' in page
     assert 'Sorry, that email wasn\'t found.' in page
+
+
+def test_book_route_allows_future_competition(client, monkeypatch, clubs_sample):
+    monkeypatch.setattr(server, 'clubs', clubs_sample)
+    monkeypatch.setattr(server, 'competitions', [
+        {'name': 'Test Competition', 'date': '2045-02-12 12:30:00', 'numberOfPlaces': '15'}
+    ])
+
+    response = client.get(
+        '/book/Test%20Competition/Test%20Club',
+    )
+
+    assert response.status_code == 200
+    assert b'How many places?' in response.data
+
+
+def test_book_route_blocks_past_competition(client, patch_data):
+    response = client.get(
+        '/book/Test%20Competition/Test%20Club',
+    )
+
+    assert response.status_code == 200
+    assert b'Points available:' in response.data
+    assert b'You can no longer register to this competition.' in response.data
 
 
 def test_purchase_places_with_enough_points(client, patch_data):
