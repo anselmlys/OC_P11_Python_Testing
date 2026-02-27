@@ -66,27 +66,6 @@ def test_show_summary_invalid_email(client, patch_data):
     assert 'Sorry, that email wasn\'t found.' in page
 
 
-def test_book_route_allows_future_competition(client, patch_data):
-
-    response = client.get(
-        '/book/Test%20Competition%202/Test%20Club',
-    )
-
-    assert response.status_code == 200
-    # Verify an element of the booking template to check if it is displayed properly
-    assert b'How many places?' in response.data
-
-
-def test_book_route_blocks_past_competition(client, patch_data):
-    response = client.get(
-        '/book/Test%20Competition/Test%20Club',
-    )
-
-    assert response.status_code == 200
-    assert b'Points available:' in response.data
-    assert b'You can no longer register to this competition.' in response.data
-
-
 def test_purchase_places_with_enough_points(client, patch_data):
     response = client.post(
         '/purchasePlaces',

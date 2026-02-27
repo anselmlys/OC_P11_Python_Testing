@@ -9,6 +9,14 @@ def is_future_competition(competition_date: str):
     return competition_datetime > datetime.now()
 
 
+def is_not_full(competition_places: str):
+    return int(competition_places) > 0
+
+
+def is_bookable(competition: dict):
+    return is_future_competition(competition['date']) and is_not_full(competition['numberOfPlaces'])
+
+
 def is_within_max_places_per_club(placesRequired: int):
     return placesRequired <= MAXIMUM_PLACES_PER_CLUB
 
