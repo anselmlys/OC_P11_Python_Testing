@@ -44,7 +44,9 @@ def test_show_summary_valid_email(client, patch_data):
     )
 
     assert response.status_code == 200
+    # Check that the email appears correctly on the page
     assert b'test@club.com' in response.data
+    # Verify an element of the welcome template to check if it is displayed properly
     assert b'Points available:' in response.data
 
 
@@ -58,7 +60,9 @@ def test_show_summary_invalid_email(client, patch_data):
     page = html.unescape(response.data.decode('utf-8'))
 
     assert response.status_code == 200
+    # Verify that the user is redirected to 'index'
     assert 'Please enter your secretary email to continue:' in page
+    # Check that the flash message appears
     assert 'Sorry, that email wasn\'t found.' in page
 
 
@@ -69,6 +73,7 @@ def test_book_route_allows_future_competition(client, patch_data):
     )
 
     assert response.status_code == 200
+    # Verify an element of the booking template to check if it is displayed properly
     assert b'How many places?' in response.data
 
 
