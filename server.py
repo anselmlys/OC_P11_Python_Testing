@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
 
-from data_loader import loadClubs, loadCompetitions, CLUBS_FILEPATH, COMPETITIONS_FILEPATH
+from data_loader import (loadClubs, loadCompetitions, updateClubPoints,
+                         updateCompetitionPlaces, CLUBS_FILEPATH, COMPETITIONS_FILEPATH)
 from services import (is_bookable, is_within_max_places_per_club,
                       club_has_enough_points)
 
@@ -56,8 +57,8 @@ def purchasePlaces():
         flash('You do not have enough points.')
         return redirect(url_for('book', club=club['name'], competition=competition['name']))
     else:
-        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-        club['points'] = int(club['points']) - placesRequired
+        updateCompetitionPlaces(competitions, competition, placesRequired, COMPETITIONS_FILEPATH)
+        updateClubPoints(clubs, club, placesRequired, CLUBS_FILEPATH)
         flash('Great-booking complete!')
         competitions_view = [
             {**comp, 'is_bookable': is_bookable(comp)}
