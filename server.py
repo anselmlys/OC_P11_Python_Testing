@@ -1,27 +1,15 @@
-import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
+from data_loader import loadClubs, loadCompetitions, CLUBS_FILEPATH, COMPETITIONS_FILEPATH
 from services import (is_bookable, is_within_max_places_per_club,
                       club_has_enough_points)
-
-
-def loadClubs():
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
-
-
-def loadCompetitions():
-    with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
 
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = loadCompetitions(COMPETITIONS_FILEPATH)
+clubs = loadClubs(CLUBS_FILEPATH)
 
 
 @app.route('/')
@@ -63,10 +51,10 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
     if not is_within_max_places_per_club(placesRequired):
         flash('You cannot book more than 12 places.')
-        return render_template('booking.html', club=club, competition=competition)
+        return redirect(url_for('book', club=club['name'], competition=competition['name']))
     elif not club_has_enough_points(club['points'], placesRequired):
         flash('You do not have enough points.')
-        return render_template('booking.html', club=club, competition=competition)
+        return redirect(url_for('book', club=club['name'], competition=competition['name']))
     else:
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
         club['points'] = int(club['points']) - placesRequired
