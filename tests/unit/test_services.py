@@ -80,3 +80,16 @@ def test_club_does_not_have_enough_points():
     club_points = '15'
     places_required = 20
     assert services.club_has_enough_points(club_points, places_required) == False
+
+# Test the function has_enough_available_places
+
+def test_competition_has_enough_available_places():
+    competition_places = '8'
+    places_required = '8'
+    assert services.has_enough_available_places(competition_places, places_required) == True
+
+
+def test_competition_does_not_have_enough_available_places():
+    competition_places = '5'
+    places_required = '8'
+    assert services.has_enough_available_places(competition_places, places_required) == False
