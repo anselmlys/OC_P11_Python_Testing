@@ -1,5 +1,6 @@
 import pytest
 import html
+import json
 
 import server
 
@@ -66,7 +67,27 @@ def test_show_summary_invalid_email(client, patch_data):
     assert 'Sorry, that email wasn\'t found.' in page
 
 
-def test_purchase_places_with_enough_points(client, patch_data):
+def test_purchase_places_with_enough_points(client, clubs_sample,
+                                            competitions_sample, tmp_path, monkeypatch):
+    # Create temporary clubs and competitions json files
+    clubs_filepath = tmp_path / 'clubs.json'
+    competitions_filepath = tmp_path / 'competitions.json'
+
+    with open(clubs_filepath, 'w') as f:
+        json.dump({'clubs': clubs_sample}, f)
+    
+    with open(competitions_filepath, 'w') as f:
+        json.dump({'competitions': competitions_sample}, f)
+    
+    # Patch filepaths
+    monkeypatch.setattr(server, 'CLUBS_FILEPATH', clubs_filepath)
+    monkeypatch.setattr(server, 'COMPETITIONS_FILEPATH', competitions_filepath)
+
+    # Patch data in server
+    monkeypatch.setattr(server, 'clubs', clubs_sample)
+    monkeypatch.setattr(server, 'competitions', competitions_sample)
+
+    # Call route
     response = client.post(
         '/purchasePlaces',
         data={
@@ -82,9 +103,9 @@ def test_purchase_places_with_enough_points(client, patch_data):
     # Verify an element of the welcome template to check if it is displayed properly
     assert b'Points available:' in response.data
     # Check that the available competition places have been updated
-    assert server.competitions[0]['numberOfPlaces'] == 10
+    assert server.competitions[0]['numberOfPlaces'] == '10'
     # Check that the points used have been deducted from the club's total
-    assert server.clubs[0]['points'] == 5
+    assert server.clubs[0]['points'] == '5'
 
 
 def test_purchase_places_without_enough_points(client, patch_data):
