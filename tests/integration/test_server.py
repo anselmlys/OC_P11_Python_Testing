@@ -20,7 +20,10 @@ def client(app):
 
 @pytest.fixture
 def clubs_sample():
-    return [{'name': 'Test Club', 'email': 'test@club.com', 'points': '10'}]
+    return [
+        {'name': 'Test Club', 'email': 'test@club.com', 'points': '10'},
+        {'name': 'Test Club 2', 'email': 'test2@club.com', 'points': '15'}
+    ]
 
 
 @pytest.fixture
@@ -172,3 +175,14 @@ def test_purchase_more_than_available_places(client, patch_data):
     assert server.competitions[0]['numberOfPlaces'] == '15'
     # Check that the club's points have not changed
     assert server.clubs[0]['points'] == '10'
+
+
+def test_display_club_points(client, patch_data):
+    response = client.get(
+        '/clubPoints'
+    )
+
+    assert response.status_code == 200
+    assert b'Test Club' in response.data
+    assert b'10' in response.data
+    assert b'Available points' in response.data
