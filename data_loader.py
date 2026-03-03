@@ -1,8 +1,9 @@
+import os
 import json
 
 
-CLUBS_FILEPATH = 'clubs.json'
-COMPETITIONS_FILEPATH = 'competitions.json'
+CLUBS_FILEPATH = os.getenv('CLUBS_FILEPATH', 'clubs.json')
+COMPETITIONS_FILEPATH = os.getenv('COMPETITIONS_FILEPATH', 'competitions.json')
 
 
 def loadClubs(path: str) -> list:
