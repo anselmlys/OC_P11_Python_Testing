@@ -44,8 +44,48 @@
 
 5. Testing
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
+    This project includes several types of automated tests:
 
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+    - Unit and integration tests (pytest)
+    - End-to-end functional tests (Playwright)
+    - Performance tests (Locust)
+    - Test coverage analysis (coverage)
 
+    ### Testing dependencies
+    - pytest
+    - playwright
+    - coverage
+    - locust
+
+    ### Pytest
+    To launch testing please use one of these commands:
+    ```
+    pytest
+    pytest -v       # verbose mode: shows each test name and result
+    pytest -q       # quiet mode: displays minimal output
+    ```
+    ### Test coverage
+    To measure how much of the code is covered by tests:
+    ```
+    pytest --cov=.
+    ```
+     
+    To generate an HTML report: 
+    ```
+    pytest --cov=. --cov-report html
+    ```
+    ### Performance test
+    To launch performance test:
+    1. Launch server (temporary JSON data will be used)
+    ```
+    python tests/utils/run_test_server.py
+    ```
+
+    2. Open a new terminal and launch locust
+    ```
+    locust -f tests/performance_tests/locustfile.py
+    ```
+
+    3. Enter the following parameters  
+    Users: 6  
+    Host: http://127.0.0.1:5000  
