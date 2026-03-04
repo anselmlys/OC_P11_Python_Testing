@@ -57,11 +57,11 @@ def start_server_with_temp_data(tmp_path):
     # Create test data
     clubs_data = {'clubs':[
         {'name': 'Test Club', 'email': 'test@club.com', 'points': '10'},
-        {'name': 'Test Club 2', 'email': 'test2@club.com', 'points': '15'}
+        {'name': 'Test Club 2', 'email': 'test2@club.com', 'points': '150'}
     ]}
 
     competitions_data = {'competitions':[
-        {'name': 'Test Competition', 'date': '2045-02-12 12:30:00', 'numberOfPlaces': '15'},
+        {'name': 'Test Competition', 'date': '2045-02-12 12:30:00', 'numberOfPlaces': '150'},
         {'name': 'Test Competition 2', 'date': '2026-01-01 14:00:00', 'numberOfPlaces': '8'}
     ]}
 
