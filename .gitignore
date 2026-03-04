@@ -6,3 +6,5 @@ lib
 __pycache__
 env/
 .pytest_cache/
+htmlcov/
+.coverage
