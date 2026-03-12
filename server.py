@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 from data_loader import (loadClubs, loadCompetitions, updateClubPoints,
                          updateCompetitionPlaces, CLUBS_FILEPATH, COMPETITIONS_FILEPATH)
 from services import (is_bookable, is_within_max_places_per_club,
-                      club_has_enough_points, has_enough_available_places)
+                      club_has_enough_points, has_enough_available_places,
+                      is_future_competition)
 
 
 app = Flask(__name__)
@@ -59,6 +60,12 @@ def purchasePlaces():
     elif not club_has_enough_points(club['points'], placesRequired):
         flash('You do not have enough points.')
         return redirect(url_for('book', club=club['name'], competition=competition['name']))
+    elif not is_future_competition(competition['date']):
+        competitions_view = [
+            {**comp, 'is_bookable': is_bookable(comp)}
+            for comp in competitions
+        ]
+        return render_template('welcome.html', club=club, competitions=competitions_view)
     else:
         updateCompetitionPlaces(competitions, competition, placesRequired, COMPETITIONS_FILEPATH)
         updateClubPoints(clubs, club, placesRequired, CLUBS_FILEPATH)
